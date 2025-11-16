@@ -173,34 +173,35 @@ export default function App(){
     if (matchesNeedingScores.length === 0) return;
     (async () => {
       try {
-        const entries: Array<[string, { nik: number; roel: number } | null]> = [];
-        for (const m of matchesNeedingScores) {
-          try {
-            const data = await API.getMatch(m.MatchID);
-            const frames = ((data as any).frames || []) as Array<{
-              NikScore: number;
-              RoelScore: number;
-              WinnerPlayerID?: 'nik'|'roel'|'';
-            }>;
-            const totals = frames.reduce(
-              (acc, frame) => {
-                const winner =
-                  frame.WinnerPlayerID === 'nik' || frame.WinnerPlayerID === 'roel'
-                    ? frame.WinnerPlayerID
-                    : frame.NikScore === frame.RoelScore
-                      ? null
-                      : frame.NikScore > frame.RoelScore ? 'nik' : 'roel';
-                if (winner) acc[winner] += 1;
-                return acc;
-              },
-              { nik: 0, roel: 0 }
-            );
-            entries.push([m.MatchID, totals]);
-          } catch (err) {
-            console.warn('Kon matchscore niet ophalen voor', m.MatchID, err);
-            entries.push([m.MatchID, null]);
-          }
-        }
+        const entries: Array<[string, { nik: number; roel: number } | null]> = await Promise.all(
+          matchesNeedingScores.map(async m => {
+            try {
+              const data = await API.getMatch(m.MatchID);
+              const frames = ((data as any).frames || []) as Array<{
+                NikScore: number;
+                RoelScore: number;
+                WinnerPlayerID?: 'nik'|'roel'|'';
+              }>;
+              const totals = frames.reduce(
+                (acc, frame) => {
+                  const winner =
+                    frame.WinnerPlayerID === 'nik' || frame.WinnerPlayerID === 'roel'
+                      ? frame.WinnerPlayerID
+                      : frame.NikScore === frame.RoelScore
+                        ? null
+                        : frame.NikScore > frame.RoelScore ? 'nik' : 'roel';
+                  if (winner) acc[winner] += 1;
+                  return acc;
+                },
+                { nik: 0, roel: 0 }
+              );
+              return [m.MatchID, totals];
+            } catch (err) {
+              console.warn('Kon matchscore niet ophalen voor', m.MatchID, err);
+              return [m.MatchID, null] as [string, { nik: number; roel: number } | null];
+            }
+          })
+        );
         if (!alive) return;
         setMatchScores(prev => {
           const next = { ...prev };
