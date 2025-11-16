@@ -49,6 +49,8 @@
   .pill-roel { @apply border-amber-200 text-amber-700; }
   .pill-neutral { @apply border-neutral-200 text-slate-500; }
   .pill-indicator { @apply inline-block w-2 h-2 rounded-full bg-current opacity-70; }
+  .pill-highlight-nik { @apply bg-blue-50 border-blue-200; }
+  .pill-highlight-roel { @apply bg-amber-50 border-amber-200; }
 
   .accordion { @apply border border-neutral-200 rounded-none bg-white shadow-sm; }
   .accordion-header { @apply w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-base font-semibold text-slate-800; }

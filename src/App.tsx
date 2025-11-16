@@ -280,11 +280,11 @@ export default function App(){
                           <div key={metric.key} className="kpi-card">
                             <div className="kpi-card-title">{metric.label}</div>
                             <div className="kpi-card-values">
-                              <span className="pill pill-nik">
+                              <span className={`pill pill-nik ${statsForDisplay.nik[metric.key] >= statsForDisplay.roel[metric.key] ? 'pill-highlight-nik' : ''}`}>
                                 Nik
                                 <span>{statsForDisplay.nik[metric.key]}</span>
                               </span>
-                              <span className="pill pill-roel">
+                              <span className={`pill pill-roel ${statsForDisplay.roel[metric.key] >= statsForDisplay.nik[metric.key] ? 'pill-highlight-roel' : ''}`}>
                                 Roel
                                 <span>{statsForDisplay.roel[metric.key]}</span>
                               </span>
