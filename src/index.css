@@ -84,17 +84,8 @@
   .match-summary-date { @apply text-2xl font-semibold text-slate-800; }
   .match-summary-winner { @apply text-sm font-semibold text-green-700; }
 
-  .frame-timeline { position: relative; padding-left: 1.25rem; }
-  .frame-timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.4rem;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    width: 2px;
-    background: rgba(15, 23, 42, 0.15);
-  }
-  .frame-timeline-row { position: relative; padding-left: 1.25rem; margin-bottom: 1.25rem; }
+  .frame-timeline { position: relative; }
+  .frame-timeline-row { position: relative; margin-bottom: 1.25rem; }
   .frame-node {
     position: absolute;
     left: 0;
@@ -117,5 +108,7 @@
   .break-player-card { @apply border border-neutral-200 bg-white p-4 space-y-3 shadow-sm; }
   .break-player-header { @apply flex items-center justify-between text-sm uppercase tracking-wide text-slate-500; }
   .break-pill { @apply inline-flex items-center justify-between w-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm; }
+  .break-pill-nik { @apply border-blue-200 bg-blue-50; }
+  .break-pill-roel { @apply border-amber-200 bg-amber-50; }
   .break-pill-value { @apply text-lg font-semibold text-slate-800; }
 }

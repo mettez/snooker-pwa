@@ -178,7 +178,6 @@ export default function MatchDetail({
             <div className="match-summary-date">{formattedDate}</div>
             <div className="muted text-xs mt-1">Best of {match.BestOf}</div>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={onClose}>Terug</button>
         </div>
         <div className="match-card-scores">
           <div className={`match-score-line ${frameTotals.roel > frameTotals.nik ? 'match-score-line-winner-roel' : ''}`}>
@@ -234,7 +233,7 @@ export default function MatchDetail({
         )}
       </section>
 
-      {!reachedBestOf ? (
+      {!reachedBestOf && (
         <section className="section" id="new-frame">
           <div className="section-heading">
             <h3 className="h2">Nieuw frame</h3>
@@ -253,10 +252,6 @@ export default function MatchDetail({
 
             <button className="btn btn-primary" onClick={addFrame as any} disabled={busy}>Toevoegen</button>
           </div>
-        </section>
-      ) : (
-        <section className="section">
-          <div className="item muted text-sm">Maximaal aantal frames voor deze match is bereikt.</div>
         </section>
       )}
 
@@ -301,10 +296,6 @@ export default function MatchDetail({
             </button>
           </div>
         )}
-        {reachedBestOf && (
-          <div className="item muted text-sm">Alle frames zijn gespeeld — er kunnen geen extra 10+ breaks meer toegevoegd worden.</div>
-        )}
-
         <div className="break-grid mt-3">
           {(['nik','roel'] as const).map(player => {
             const playerBreaks = breaks.filter(b => b.PlayerID === player);
@@ -319,7 +310,10 @@ export default function MatchDetail({
                     const frameId = b.FrameID ?? (b as any).FrameId;
                     const frameLabel = b.FrameNo ?? (frameId ? frames.find(f=>f.FrameID===frameId)?.FrameNo : undefined);
                     return (
-                      <div key={b.BreakID} className="break-pill">
+                      <div
+                        key={b.BreakID}
+                        className={`break-pill ${player === 'nik' ? 'break-pill-nik' : 'break-pill-roel'}`}
+                      >
                         <span className="break-pill-value">{b.Points}</span>
                         <span className="muted text-xs">{frameLabel ? `Frame ${frameLabel}` : 'Frame ?'}</span>
                       </div>
