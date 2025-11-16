@@ -165,11 +165,9 @@ export default function MatchDetail({
 
   if (!match) return <div className="card">Laden…</div>;
 
-  const matchWinner = match.WinnerPlayerID === 'nik' || match.WinnerPlayerID === 'roel'
-    ? match.WinnerPlayerID
-    : null;
-  const matchWinnerLabel = matchWinner ? playerLabel[matchWinner] : null;
   const formattedDate = new Date(match.Date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' });
+  const nikStarted = match.FirstBreakerPlayerID === 'nik';
+  const roelStarted = match.FirstBreakerPlayerID === 'roel';
 
   return (
     <div className="space-y-6">
@@ -183,26 +181,20 @@ export default function MatchDetail({
           <button className="btn btn-ghost btn-sm" onClick={onClose}>Terug</button>
         </div>
         <div className="match-card-scores">
-          <div className="match-score-line">
-            <span className="pill pill-roel">{playerLabel.roel}</span>
+          <div className={`match-score-line ${frameTotals.roel > frameTotals.nik ? 'match-score-line-winner-roel' : ''}`}>
+            <span className="pill pill-roel">
+              {playerLabel.roel}
+              {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
+            </span>
             <span className="match-score-value match-score-value-roel">{frameTotals.roel}</span>
           </div>
-          <div className="match-score-line">
-            <span className="pill pill-nik">{playerLabel.nik}</span>
+          <div className={`match-score-line ${frameTotals.nik > frameTotals.roel ? 'match-score-line-winner-nik' : ''}`}>
+            <span className="pill pill-nik">
+              {playerLabel.nik}
+              {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
+            </span>
             <span className="match-score-value match-score-value-nik">{frameTotals.nik}</span>
           </div>
-        </div>
-        <div className="match-card-flags">
-          {matchWinnerLabel ? (
-            <span className={`chip ${matchWinner === 'nik' ? 'chip-ok' : 'chip-warn'}`}>
-              {matchWinnerLabel} wint
-            </span>
-          ) : (
-            <span className="chip chip-neutral">Nog bezig</span>
-          )}
-        </div>
-        <div className="match-card-footer">
-          <span>Break-off: {match.FirstBreakerPlayerID ? playerLabel[match.FirstBreakerPlayerID] : '—'}</span>
         </div>
       </div>
 
@@ -220,20 +212,16 @@ export default function MatchDetail({
               const winner = getFrameWinner(frame);
               return (
                 <div className="frame-timeline-row" key={frame.FrameID}>
-                  <span className={`frame-node ${winner === 'nik' ? 'frame-node-nik' : winner === 'roel' ? 'frame-node-roel' : ''}`} />
                   <div className="frame-card">
                     <div className="frame-card-header">
                       <div className="frame-card-title">Frame {frame.FrameNo}</div>
-                      <span className={`chip ${winner ? (winner === 'nik' ? 'chip-ok' : 'chip-warn') : 'chip-neutral'}`}>
-                        {winner ? `${playerLabel[winner]} wint` : 'Nog bezig'}
-                      </span>
                     </div>
                     <div className="frame-card-body">
-                      <div className="match-score-line">
+                      <div className={`match-score-line ${winner === 'roel' ? 'match-score-line-winner-roel' : ''}`}>
                         <span className="pill pill-roel">{playerLabel.roel}</span>
                         <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
                       </div>
-                      <div className="match-score-line">
+                      <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
                         <span className="pill pill-nik">{playerLabel.nik}</span>
                         <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
                       </div>

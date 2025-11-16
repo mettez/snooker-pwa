@@ -71,6 +71,8 @@
   .match-card-meta { @apply text-xs uppercase tracking-wide text-slate-500; }
   .match-card-scores { @apply space-y-3; }
   .match-score-line { @apply flex items-center justify-between border border-neutral-200 bg-white px-4 py-2; }
+  .match-score-line-winner-nik { @apply bg-blue-50 border-blue-200; }
+  .match-score-line-winner-roel { @apply bg-amber-50 border-amber-200; }
   .match-score-value { @apply text-3xl font-bold text-slate-800; }
   .match-score-value-nik { @apply text-blue-700; }
   .match-score-value-roel { @apply text-amber-700; }

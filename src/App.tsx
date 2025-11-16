@@ -397,7 +397,7 @@ export default function App(){
                             </button>
                           </div>
                           <div className="match-card-scores">
-                            <div className="match-score-line">
+                            <div className={`match-score-line ${nikLeading ? 'match-score-line-winner-nik' : ''}`}>
                               <span className="pill pill-nik">
                                 Nik
                                 {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
@@ -406,7 +406,7 @@ export default function App(){
                                 {typeof nikFrames === 'number' ? nikFrames : '—'}
                               </span>
                             </div>
-                            <div className="match-score-line">
+                            <div className={`match-score-line ${roelLeading ? 'match-score-line-winner-roel' : ''}`}>
                               <span className="pill pill-roel">
                                 Roel
                                 {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
