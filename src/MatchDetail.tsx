@@ -43,8 +43,7 @@ const getFrameWinner = (frame: Frame): 'nik' | 'roel' | null => {
 
 export default function MatchDetail({
   matchId,
-  onClose,
-}: { matchId: string; onClose: () => void }) {
+}: { matchId: string }) {
   const [match, setMatch] = useState<Match | null>(null);
   const [frames, setFrames] = useState<Frame[]>([]);
   const [breaks, setBreaks] = useState<Break[]>([]);

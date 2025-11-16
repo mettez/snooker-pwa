@@ -23,7 +23,6 @@ type Match = {
   RoelScore?: number;
 };
 
-const PLAYER_LABEL: Record<'nik'|'roel', string> = { nik: 'Nik', roel: 'Roel' };
 const KPI_FIELDS: Array<{ key: keyof Stats['nik']; label: string; helper?: string }> = [
   { key: 'matches', label: 'Matches gespeeld' },
   { key: 'frames', label: 'Frames gewonnen' },
@@ -227,7 +226,7 @@ export default function App(){
             </div>
             <button className="btn btn-ghost btn-sm" onClick={()=> setSelected(null)}>Terug</button>
           </header>
-          <MatchDetail matchId={selected} onClose={()=> setSelected(null)} />
+          <MatchDetail matchId={selected} />
         </div>
       </div>
     );
