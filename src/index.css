@@ -20,19 +20,19 @@
   .section-heading { @apply flex items-center justify-between gap-3 text-slate-200; }
   .hero { @apply flex flex-wrap items-center justify-between gap-4 bg-slate-950 text-white px-4 py-4 border border-white/5 rounded-2xl; }
 
-  .h1 { @apply text-3xl sm:text-4xl font-semibold tracking-tight; }
-  .h2 { @apply text-xl font-semibold text-slate-100; }
-  .muted { @apply text-sm text-slate-400; }
+  .h1 { @apply text-xl sm:text-2xl font-semibold tracking-tight; }
+  .h2 { @apply text-base font-semibold text-slate-100; }
+  .muted { @apply text-[11px] text-slate-400; }
 
   .item { @apply rounded-2xl border border-white/5 bg-slate-900/60 p-4; }
   .row  { @apply flex flex-wrap items-center justify-between gap-4; }
 
-  .btn { @apply inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-5 py-2 text-sm font-semibold tracking-tight text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900; }
-  .btn-sm { @apply px-3 py-1.5 text-xs font-semibold; }
+  .btn { @apply inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-3 py-1 text-[11px] font-semibold tracking-tight text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900; }
+  .btn-sm { @apply px-2.5 py-0.5 text-[10px] font-semibold; }
   .btn-primary { @apply border-white/10 bg-white/5 text-white hover:bg-white/10; }
   .btn-ghost   { @apply border-white/10 text-white hover:bg-white/5; }
 
-  .input { @apply w-full rounded-xl border border-white/10 bg-slate-900/60 px-3 py-2 text-base text-white placeholder-slate-500 outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-300/30; }
+  .input { @apply w-full rounded-xl border border-white/10 bg-slate-900/60 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-300/30; }
   .label { @apply text-xs uppercase tracking-wide text-slate-400; }
 
   .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-white/10 text-slate-100; }
@@ -44,7 +44,7 @@
   .sticky-inner { @apply max-w-md mx-auto p-3; }
   .glass { @apply bg-slate-900/80 border-t border-white/10; }
 
-  .pill { @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100; }
+  .pill { @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-100; }
   .pill-nik { @apply border-sky-400/40 text-sky-300; }
   .pill-roel { @apply border-amber-400/40 text-amber-200; }
   .pill-neutral { @apply border-slate-600 text-slate-400; }
@@ -53,7 +53,7 @@
   .pill-highlight-roel { @apply bg-amber-500/10 border-amber-300/40; }
 
   .accordion { @apply border border-white/10 rounded-2xl bg-slate-900/60 shadow-inner shadow-black/20; }
-  .accordion-header { @apply w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-base font-semibold text-slate-100; }
+  .accordion-header { @apply w-full flex items-center justify-between gap-3 px-3 py-2 text-left text-sm font-semibold text-slate-100; }
   .accordion-icon { @apply inline-flex items-center justify-center rounded-full border border-white/10 w-8 h-8 text-xs transition-transform; }
   .accordion-icon-open { @apply rotate-180; }
 
@@ -64,18 +64,18 @@
 
   .recent-empty { @apply text-center text-sm text-slate-500 py-8; }
 
-  .match-card { @apply item space-y-4 bg-slate-900/80; }
+  .match-card { @apply item space-y-3 bg-slate-900/80; }
   .match-card-nik { @apply border-sky-400/30; }
   .match-card-roel { @apply border-amber-400/30; }
   .match-card-active { @apply border-lime-400 shadow-lg shadow-lime-500/20; }
-  .match-card-header { @apply flex items-start justify-between gap-4; }
-  .match-card-date { @apply text-sm font-semibold text-slate-100; }
-  .match-card-meta { @apply text-xs uppercase tracking-wide text-slate-400; }
-  .match-card-scores { @apply space-y-3; }
-  .match-score-line { @apply flex items-center justify-between border border-white/10 bg-slate-950/60 px-4 py-2 rounded-2xl; }
+  .match-card-header { @apply flex items-start justify-between gap-2; }
+  .match-card-date { @apply text-[11px] font-semibold text-slate-100; }
+  .match-card-meta { @apply text-[10px] uppercase tracking-wide text-slate-400; }
+  .match-card-scores { @apply space-y-2; }
+  .match-score-line { @apply flex items-center justify-between border border-white/10 bg-slate-950/60 px-3 py-1.5 rounded-2xl; }
   .match-score-line-winner-nik { @apply bg-sky-500/10 border-sky-400/50; }
   .match-score-line-winner-roel { @apply bg-amber-500/10 border-amber-400/50; }
-  .match-score-value { @apply text-3xl font-bold text-white; }
+  .match-score-value { @apply text-xl font-bold text-white; }
   .match-score-value-nik { @apply text-sky-300; }
   .match-score-value-roel { @apply text-amber-200; }
   .match-card-flags { @apply flex flex-wrap gap-2 text-xs; }
