@@ -369,12 +369,13 @@ export default function App(){
                       const displayDate = new Date(m.Date).toLocaleDateString('nl-BE');
                       const tone = nikLeading ? 'match-card-nik' : roelLeading ? 'match-card-roel' : '';
                       const isSelected = selected === m.MatchID;
+                      const nikStarted = m.FirstBreakerPlayerID === 'nik';
+                      const roelStarted = m.FirstBreakerPlayerID === 'roel';
                       return (
                         <div key={m.MatchID} className={['match-card', tone, isSelected ? 'match-card-active' : ''].filter(Boolean).join(' ')}>
                           <div className="match-card-header">
                             <div>
                               <div className="match-card-date">{displayDate}</div>
-                              <div className="match-card-meta">Best of {m.BestOf}</div>
                             </div>
                             <button className="btn btn-primary btn-sm" onClick={()=> setSelected(m.MatchID)}>
                               {isSelected ? 'Geopend' : 'Bekijk'}
@@ -382,31 +383,33 @@ export default function App(){
                           </div>
                           <div className="match-card-scores">
                             <div className="match-score-line">
-                              <span className="pill pill-nik">Nik</span>
+                              <span className="pill pill-nik">
+                                Nik
+                                {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
+                              </span>
                               <span className={`match-score-value match-score-value-nik`}>
                                 {typeof nikFrames === 'number' ? nikFrames : '—'}
                               </span>
                             </div>
                             <div className="match-score-line">
-                              <span className="pill pill-roel">Roel</span>
+                              <span className="pill pill-roel">
+                                Roel
+                                {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
+                              </span>
                               <span className={`match-score-value match-score-value-roel`}>
                                 {typeof roelFrames === 'number' ? roelFrames : '—'}
                               </span>
                             </div>
                           </div>
                           <div className="match-card-flags">
-                            {hasBoth && (
-                              <span className={`chip ${nikLeading ? 'chip-ok' : roelLeading ? 'chip-warn' : 'chip-neutral'}`}>
-                                {nikLeading ? 'Nik leidt' : roelLeading ? 'Roel leidt' : 'Gelijk'}
-                              </span>
-                            )}
                             {loadError && <span className="chip chip-warn">Score niet beschikbaar</span>}
                             {!loadError && !hasBoth && <span className="chip chip-neutral">Nog bezig</span>}
                           </div>
-                          <div className="match-card-footer">
-                            <span>Break-off: {m.FirstBreakerPlayerID ? PLAYER_LABEL[m.FirstBreakerPlayerID] : '—'}</span>
-                            {m.Notes && <span className="muted text-xs">{m.Notes}</span>}
-                          </div>
+                          {m.Notes && (
+                            <div className="match-card-footer">
+                              <span className="muted text-xs">{m.Notes}</span>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
