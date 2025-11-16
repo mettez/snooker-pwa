@@ -92,6 +92,21 @@ export default function App(){
     return ()=> { alive = false; };
   },[season]);
 
+  useEffect(() => {
+    if (!matches.length) return;
+    const lastWithBreaker = matches.reduce<Match | null>((latest, match) => {
+      if (!match.FirstBreakerPlayerID || (match.FirstBreakerPlayerID !== 'nik' && match.FirstBreakerPlayerID !== 'roel')) {
+        return latest;
+      }
+      if (!latest) return match;
+      const latestDate = new Date(latest.Date).getTime();
+      const currentDate = new Date(match.Date).getTime();
+      return currentDate > latestDate ? match : latest;
+    }, null);
+    if (!lastWithBreaker?.FirstBreakerPlayerID) return;
+    setStarter(lastWithBreaker.FirstBreakerPlayerID === 'nik' ? 'roel' : 'nik');
+  }, [matches]);
+
   async function createMatch(e: React.FormEvent){
     e.preventDefault();
     setMsg(null);
