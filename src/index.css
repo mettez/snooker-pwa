@@ -3,87 +3,87 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 @layer base {
   html, body, #root { min-height: 100%; }
-  body { @apply bg-neutral-100 text-slate-800 antialiased; }
+  body { @apply bg-slate-950 text-slate-100 antialiased; }
 }
 
 @layer components {
-  .app-shell { @apply min-h-screen bg-neutral-100; }
-  .container { @apply max-w-4xl mx-auto px-3 sm:px-6 py-6 space-y-6 bg-white shadow-sm border border-neutral-200; }
+  .app-shell { @apply min-h-screen bg-black text-slate-100; }
+  .container { @apply max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6 bg-slate-900/40; }
   .layout-grid { @apply space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0; }
   .stack { @apply space-y-6; }
   .section { @apply space-y-4; }
-  .section-heading { @apply flex items-center justify-between gap-3 text-slate-700; }
-  .hero { @apply flex flex-wrap items-center justify-between gap-4 bg-green-600 text-white px-4 py-4; }
+  .section-heading { @apply flex items-center justify-between gap-3 text-slate-200; }
+  .hero { @apply flex flex-wrap items-center justify-between gap-4 bg-slate-950 text-white px-4 py-4 border border-white/5 rounded-2xl; }
 
-  .h1 { @apply text-3xl sm:text-4xl font-bold; }
-  .h2 { @apply text-xl font-semibold text-slate-800; }
-  .muted { @apply text-sm text-slate-500; }
+  .h1 { @apply text-3xl sm:text-4xl font-semibold tracking-tight; }
+  .h2 { @apply text-xl font-semibold text-slate-100; }
+  .muted { @apply text-sm text-slate-400; }
 
-  .item { @apply rounded-none border border-neutral-200 bg-white p-4; }
+  .item { @apply rounded-2xl border border-white/5 bg-slate-900/60 p-4; }
   .row  { @apply flex flex-wrap items-center justify-between gap-4; }
 
-  .btn { @apply inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold tracking-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white; }
+  .btn { @apply inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-5 py-2 text-sm font-semibold tracking-tight text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900; }
   .btn-sm { @apply px-3 py-1.5 text-xs font-semibold; }
-  .btn-primary { @apply bg-green-600 text-white hover:bg-green-500; }
-  .btn-ghost   { @apply border border-neutral-300 text-slate-700 hover:bg-neutral-100; }
+  .btn-primary { @apply border-white/10 bg-white/5 text-white hover:bg-white/10; }
+  .btn-ghost   { @apply border-white/10 text-white hover:bg-white/5; }
 
-  .input { @apply w-full rounded-none border border-neutral-300 bg-white px-3 py-2 text-base text-slate-800 placeholder-slate-400 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200; }
-  .label { @apply text-xs uppercase tracking-wide text-slate-500; }
+  .input { @apply w-full rounded-xl border border-white/10 bg-slate-900/60 px-3 py-2 text-base text-white placeholder-slate-500 outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-300/30; }
+  .label { @apply text-xs uppercase tracking-wide text-slate-400; }
 
-  .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-neutral-200 text-slate-700; }
-  .chip  { @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-neutral-100 border border-neutral-200 text-slate-600; }
-  .chip-ok { @apply bg-green-50 border-green-200 text-green-700; }
-  .chip-warn { @apply bg-amber-50 border-amber-200 text-amber-700; }
-  .chip-neutral { @apply bg-neutral-100 border-neutral-200 text-slate-500; }
+  .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-white/10 text-slate-100; }
+  .chip  { @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-slate-900/60 border border-white/10 text-slate-200; }
+  .chip-ok { @apply bg-emerald-500/10 border-emerald-400/40 text-emerald-300; }
+  .chip-warn { @apply bg-amber-500/10 border-amber-400/40 text-amber-200; }
+  .chip-neutral { @apply bg-slate-800 border-white/10 text-slate-400; }
   .sticky-bar { @apply sticky bottom-0 inset-x-0; }
   .sticky-inner { @apply max-w-md mx-auto p-3; }
-  .glass { @apply bg-white/90 border-t border-neutral-200; }
+  .glass { @apply bg-slate-900/80 border-t border-white/10; }
 
-  .pill { @apply inline-flex items-center gap-2 rounded-full border border-neutral-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700; }
-  .pill-nik { @apply border-blue-200 text-blue-700; }
-  .pill-roel { @apply border-amber-200 text-amber-700; }
-  .pill-neutral { @apply border-neutral-200 text-slate-500; }
+  .pill { @apply inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100; }
+  .pill-nik { @apply border-sky-400/40 text-sky-300; }
+  .pill-roel { @apply border-amber-400/40 text-amber-200; }
+  .pill-neutral { @apply border-slate-600 text-slate-400; }
   .pill-indicator { @apply inline-block w-2 h-2 rounded-full bg-current opacity-70; }
-  .pill-highlight-nik { @apply bg-blue-50 border-blue-200; }
-  .pill-highlight-roel { @apply bg-amber-50 border-amber-200; }
+  .pill-highlight-nik { @apply bg-sky-500/10 border-sky-300/40; }
+  .pill-highlight-roel { @apply bg-amber-500/10 border-amber-300/40; }
 
-  .accordion { @apply border border-neutral-200 rounded-none bg-white shadow-sm; }
-  .accordion-header { @apply w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-base font-semibold text-slate-800; }
-  .accordion-icon { @apply inline-flex items-center justify-center rounded-full border border-neutral-300 w-8 h-8 text-xs transition-transform; }
+  .accordion { @apply border border-white/10 rounded-2xl bg-slate-900/60 shadow-inner shadow-black/20; }
+  .accordion-header { @apply w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-base font-semibold text-slate-100; }
+  .accordion-icon { @apply inline-flex items-center justify-center rounded-full border border-white/10 w-8 h-8 text-xs transition-transform; }
   .accordion-icon-open { @apply rotate-180; }
 
   .kpi-grid { @apply grid gap-4 sm:grid-cols-2; }
-  .kpi-card { @apply rounded-none border border-neutral-200 bg-white p-4 space-y-3 shadow-inner shadow-neutral-100; }
-  .kpi-card-title { @apply text-xs uppercase tracking-wide text-slate-500; }
+  .kpi-card { @apply rounded-2xl border border-white/10 bg-slate-900/80 p-4 space-y-3 shadow-inner shadow-black/40; }
+  .kpi-card-title { @apply text-xs uppercase tracking-wide text-slate-400; }
   .kpi-card-values { @apply flex flex-wrap gap-2; }
 
   .recent-empty { @apply text-center text-sm text-slate-500 py-8; }
 
-  .match-card { @apply item space-y-4; }
-  .match-card-nik { @apply border-blue-200; }
-  .match-card-roel { @apply border-amber-200; }
-  .match-card-active { @apply border-green-500 shadow-md; }
+  .match-card { @apply item space-y-4 bg-slate-900/80; }
+  .match-card-nik { @apply border-sky-400/30; }
+  .match-card-roel { @apply border-amber-400/30; }
+  .match-card-active { @apply border-lime-400 shadow-lg shadow-lime-500/20; }
   .match-card-header { @apply flex items-start justify-between gap-4; }
-  .match-card-date { @apply text-sm font-semibold text-slate-700; }
-  .match-card-meta { @apply text-xs uppercase tracking-wide text-slate-500; }
+  .match-card-date { @apply text-sm font-semibold text-slate-100; }
+  .match-card-meta { @apply text-xs uppercase tracking-wide text-slate-400; }
   .match-card-scores { @apply space-y-3; }
-  .match-score-line { @apply flex items-center justify-between border border-neutral-200 bg-white px-4 py-2; }
-  .match-score-line-winner-nik { @apply bg-blue-50 border-blue-200; }
-  .match-score-line-winner-roel { @apply bg-amber-50 border-amber-200; }
-  .match-score-value { @apply text-3xl font-bold text-slate-800; }
-  .match-score-value-nik { @apply text-blue-700; }
-  .match-score-value-roel { @apply text-amber-700; }
+  .match-score-line { @apply flex items-center justify-between border border-white/10 bg-slate-950/60 px-4 py-2 rounded-2xl; }
+  .match-score-line-winner-nik { @apply bg-sky-500/10 border-sky-400/50; }
+  .match-score-line-winner-roel { @apply bg-amber-500/10 border-amber-400/50; }
+  .match-score-value { @apply text-3xl font-bold text-white; }
+  .match-score-value-nik { @apply text-sky-300; }
+  .match-score-value-roel { @apply text-amber-200; }
   .match-card-flags { @apply flex flex-wrap gap-2 text-xs; }
-  .match-card-footer { @apply flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500; }
+  .match-card-footer { @apply flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400; }
 
-  .match-summary-panel { @apply border border-neutral-200 bg-white p-5 space-y-4 shadow-sm; }
+  .match-summary-panel { @apply border border-white/10 bg-slate-900/80 p-5 space-y-4 shadow-inner shadow-black/40 rounded-2xl; }
   .match-summary-top { @apply flex flex-wrap items-end justify-between gap-4; }
-  .match-summary-date { @apply text-2xl font-semibold text-slate-800; }
+  .match-summary-date { @apply text-2xl font-semibold text-white; }
   .match-summary-winner { @apply text-sm font-semibold text-green-700; }
 
   .frame-timeline { position: relative; }
@@ -99,18 +99,18 @@
   }
   .frame-node-nik { background: #0ea5e9; }
   .frame-node-roel { background: #f97316; }
-  .frame-card { @apply border border-neutral-200 bg-white p-4 shadow-sm; }
+  .frame-card { @apply border border-white/10 bg-slate-900/80 p-4 shadow-sm rounded-2xl; }
   .frame-card-header { @apply flex items-center justify-between gap-3; }
-  .frame-card-title { @apply text-sm font-semibold text-slate-700; }
+  .frame-card-title { @apply text-sm font-semibold text-slate-100; }
   .frame-card-body { @apply mt-3 space-y-2; }
 
   .break-list { @apply space-y-3; }
   .break-card { @apply item py-3 px-4; }
   .break-grid { @apply grid gap-4 md:grid-cols-2; }
-  .break-player-card { @apply border border-neutral-200 bg-white p-4 space-y-3 shadow-sm; }
-  .break-player-header { @apply flex items-center justify-between text-sm uppercase tracking-wide text-slate-500; }
-  .break-pill { @apply inline-flex items-center justify-between w-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm; }
-  .break-pill-nik { @apply border-blue-200 bg-blue-50; }
-  .break-pill-roel { @apply border-amber-200 bg-amber-50; }
-  .break-pill-value { @apply text-lg font-semibold text-slate-800; }
+  .break-player-card { @apply border border-white/10 bg-slate-900/80 p-4 space-y-3 shadow-sm rounded-2xl; }
+  .break-player-header { @apply flex items-center justify-between text-sm uppercase tracking-wide text-slate-400; }
+  .break-pill { @apply inline-flex items-center justify-between w-full border border-white/10 bg-slate-950/50 px-4 py-2 text-sm rounded-xl; }
+  .break-pill-nik { @apply border-sky-400/50 bg-sky-500/10; }
+  .break-pill-roel { @apply border-amber-400/50 bg-amber-500/10; }
+  .break-pill-value { @apply text-lg font-semibold text-white; }
 }

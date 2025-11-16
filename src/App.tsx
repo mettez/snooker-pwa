@@ -24,10 +24,10 @@ type Match = {
 };
 
 const KPI_FIELDS: Array<{ key: keyof Stats['nik']; label: string; helper?: string }> = [
-  { key: 'matches', label: 'Matches gespeeld' },
-  { key: 'frames', label: 'Frames gewonnen' },
-  { key: 'hiBreak', label: 'Highest break' },
-  { key: 'breaks10', label: '10+ breaks' },
+  { key: 'matches', label: 'Wedstrijden' },
+  { key: 'frames', label: 'Frames' },
+  { key: 'hiBreak', label: 'Hoogste Break' },
+  { key: 'breaks10', label: 'Aantal 10+ Breaks' },
 ];
 
 function generateDefaultSeasons(current: number) {
@@ -222,7 +222,7 @@ export default function App(){
         <div className="container space-y-6">
           <header className="hero">
             <div>
-              <h1 className="h1">Snooker</h1>
+              <h1 className="h1">SnookerScore</h1>
               <div className="muted">Seizoen {season}</div>
             </div>
             <button className="btn btn-ghost btn-sm" onClick={()=> setSelected(null)}>Terug</button>
@@ -238,7 +238,7 @@ export default function App(){
       <div className="container">
         <header className="hero">
           <div>
-            <h1 className="h1">Snooker</h1>
+            <h1 className="h1">SnookerScore</h1>
           </div>
           <div className="space-y-2">
             <span className="label">Seizoen</span>
