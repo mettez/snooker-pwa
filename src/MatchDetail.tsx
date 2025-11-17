@@ -180,14 +180,14 @@ export default function MatchDetail({
         </div>
         <div className="match-card-scores">
           <div className={`match-score-line ${frameTotals.roel > frameTotals.nik ? 'match-score-line-winner-roel' : ''}`}>
-            <span className="pill pill-roel">
+            <span className="flex items-center gap-2 text-xs font-semibold uppercase text-amber-200">
               {playerLabel.roel}
               {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
             </span>
             <span className="match-score-value match-score-value-roel">{frameTotals.roel}</span>
           </div>
           <div className={`match-score-line ${frameTotals.nik > frameTotals.roel ? 'match-score-line-winner-nik' : ''}`}>
-            <span className="pill pill-nik">
+            <span className="flex items-center gap-2 text-xs font-semibold uppercase text-sky-300">
               {playerLabel.nik}
               {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
             </span>
@@ -216,11 +216,11 @@ export default function MatchDetail({
                     </div>
                     <div className="frame-card-body">
                       <div className={`match-score-line ${winner === 'roel' ? 'match-score-line-winner-roel' : ''}`}>
-                        <span className="pill pill-roel">{playerLabel.roel}</span>
+                        <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
                         <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
                       </div>
                       <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
-                        <span className="pill pill-nik">{playerLabel.nik}</span>
+                        <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
                         <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
                       </div>
                     </div>

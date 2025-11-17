@@ -398,7 +398,7 @@ export default function App(){
                           </div>
                           <div className="match-card-scores">
                             <div className={`match-score-line ${nikLeading ? 'match-score-line-winner-nik' : ''}`}>
-                              <span className="pill pill-nik">
+                              <span className="flex items-center gap-2 text-xs font-semibold uppercase text-sky-300">
                                 Nik
                                 {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
                               </span>
@@ -407,7 +407,7 @@ export default function App(){
                               </span>
                             </div>
                             <div className={`match-score-line ${roelLeading ? 'match-score-line-winner-roel' : ''}`}>
-                              <span className="pill pill-roel">
+                              <span className="flex items-center gap-2 text-xs font-semibold uppercase text-amber-200">
                                 Roel
                                 {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
                               </span>
