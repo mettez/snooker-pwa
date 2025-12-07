@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
-import type { Break, Frame, Match, Player } from '../types/database';
+import type { Break, Database, Frame, Match, Player } from '../types/database';
 
 type LegacyMatch = {
   MatchID: string;
@@ -106,6 +106,7 @@ export async function createMatch(input: {
   firstBreakerPlayerID?: 'nik' | 'roel';
   notes?: string | null;
 }) {
+  type MatchInsert = Database['public']['Tables']['matches']['Insert'];
   const { data, error } = await supabase
     .from('matches')
     .insert([
@@ -115,7 +116,7 @@ export async function createMatch(input: {
         best_of: input.bestOf,
         first_breaker_id: input.firstBreakerPlayerID ?? null,
         notes: input.notes ?? null,
-      },
+      } as MatchInsert,
     ])
     .select()
     .single();
@@ -131,6 +132,7 @@ export async function createFrame(input: {
   breakerId?: 'nik' | 'roel';
   season?: number;
 }) {
+  type FrameInsert = Database['public']['Tables']['frames']['Insert'];
   const { error } = await supabase.from('frames').insert([
     {
       match_id: input.matchId,
@@ -139,7 +141,7 @@ export async function createFrame(input: {
       roel_score: input.roelScore,
       breaker_id: input.breakerId ?? null,
       season: input.season ?? new Date().getFullYear(),
-    },
+    } as FrameInsert,
   ]);
   if (error) throw error;
 }
@@ -151,6 +153,7 @@ export async function createBreak(input: {
   points: number;
   season?: number;
 }) {
+  type BreakInsert = Database['public']['Tables']['breaks']['Insert'];
   const { error } = await supabase.from('breaks').insert([
     {
       match_id: input.matchId,
@@ -158,7 +161,7 @@ export async function createBreak(input: {
       player_id: input.playerId,
       points: input.points,
       season: input.season ?? new Date().getFullYear(),
-    },
+    } as BreakInsert,
   ]);
   if (error) throw error;
 }

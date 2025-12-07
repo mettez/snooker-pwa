@@ -36,5 +36,9 @@ export type Database = {
       frames: { Row: Frame; Insert: Omit<Frame, 'id'> & { id?: string }; Update: Partial<Frame> };
       breaks: { Row: Break; Insert: Omit<Break, 'id'> & { id?: string }; Update: Partial<Break> };
     };
+    Views: {};
+    Functions: {};
+    Enums: {};
+    CompositeTypes: {};
   };
 };
