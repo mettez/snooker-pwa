@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-//import './index.css';
-import { API } from './lib/api';
+import {
+  createMatch as createMatchRecord,
+  getBreaksBySeason,
+  getFramesBySeason,
+  getFramesForMatch,
+  getMatchesBySeason,
+  getSeasons,
+} from './data/scoresRepository';
 import MatchDetail from './MatchDetail';
 
 
@@ -34,6 +40,55 @@ function generateDefaultSeasons(current: number) {
   return Array.from({ length: 7 }).map((_, idx) => current + 1 - idx);
 }
 
+function computeSeasonStats(matches: Match[], frames: any[], breaks: any[]): Stats {
+  const stats: Stats = {
+    nik: { matches: 0, frames: 0, hiBreak: 0, breaks10: 0 },
+    roel:{ matches: 0, frames: 0, hiBreak: 0, breaks10: 0 },
+  };
+
+  const framesByMatch = frames.reduce<Record<string, { nik: number; roel: number }>>((acc, f) => {
+    acc[f.MatchID] ||= { nik: 0, roel: 0 };
+    const winner =
+      f.WinnerPlayerID === 'nik' || f.WinnerPlayerID === 'roel'
+        ? f.WinnerPlayerID
+        : f.NikScore === f.RoelScore
+          ? null
+          : f.NikScore > f.RoelScore ? 'nik' : 'roel';
+    if (winner) acc[f.MatchID][winner] += 1;
+    return acc;
+  }, {});
+
+  for (const m of matches) {
+    const declared = m.WinnerPlayerID;
+    if (declared === 'nik' || declared === 'roel') {
+      stats[declared].matches += 1;
+      continue;
+    }
+    const totals = framesByMatch[m.MatchID];
+    if (!totals) continue;
+    if (totals.nik > totals.roel) stats.nik.matches += 1;
+    if (totals.roel > totals.nik) stats.roel.matches += 1;
+  }
+
+  for (const f of frames) {
+    const winner =
+      f.WinnerPlayerID === 'nik' || f.WinnerPlayerID === 'roel'
+        ? f.WinnerPlayerID
+        : f.NikScore === f.RoelScore
+          ? null
+          : f.NikScore > f.RoelScore ? 'nik' : 'roel';
+    if (winner) stats[winner].frames += 1;
+  }
+
+  for (const b of breaks) {
+    const p = b.PlayerID;
+    if (p !== 'nik' && p !== 'roel') continue;
+    if (b.Points >= 10) stats[p].breaks10 += 1;
+    if (b.Points > stats[p].hiBreak) stats[p].hiBreak = b.Points;
+  }
+  return stats;
+}
+
 export default function App(){
   const currentYear = new Date().getFullYear();
   const [seasons, setSeasons] = useState<number[]>(generateDefaultSeasons(currentYear));
@@ -56,14 +111,11 @@ export default function App(){
 
   useEffect(()=>{
     const current = new Date().getFullYear();
-    API.listSeasons()
-      .then((data: any)=>{
-        const seasonList: number[] = Array.isArray(data?.seasons)
-          ? data.seasons.map((value: unknown) => Number(value)).filter((value: number) => !Number.isNaN(value))
-          : [];
-        if (seasonList.length) {
-          setSeasons(seasonList);
-          setSeason(seasonList.includes(current) ? current : seasonList[0]);
+    getSeasons()
+      .then(list => {
+        if (list.length) {
+          setSeasons(list);
+          setSeason(list.includes(current) ? current : list[0]);
         } else {
           setSeasons(generateDefaultSeasons(current));
           setSeason(current);
@@ -80,11 +132,15 @@ export default function App(){
     let alive = true;
     setLoading(true);
     setMatchScores({});
-    Promise.all([API.seasonStats(season), API.listMatches(season)])
-      .then(([s, m])=>{
+    Promise.all([
+      getMatchesBySeason(season),
+      getFramesBySeason(season),
+      getBreaksBySeason(season),
+    ])
+      .then(([matchesData, framesData, breaksData])=>{
         if (!alive) return;
-        setStats((s as any).stats);
-        setMatches((m as any).matches);
+        setMatches(matchesData);
+        setStats(computeSeasonStats(matchesData as any, framesData as any, breaksData as any));
       })
       .catch(e=> setMsg('Fout: ' + e.message))
       .finally(()=> setLoading(false));
@@ -110,17 +166,24 @@ export default function App(){
     e.preventDefault();
     setMsg(null);
     try{
-      const created = await API.addMatch({ date, bestOf, firstBreakerPlayerID: starter }) as any;
-      const newMatchId: string | undefined =
-        created?.matchId ||
-        created?.MatchID ||
-        created?.match?.MatchID ||
-        created?.match?.matchId;
+      // Neem het jaar uit het ingevulde datumveld om het seizoen af te leiden
+      const parsedYear = Number((date ?? '').slice(0, 4));
+      const seasonFromDate = Number.isFinite(parsedYear) ? parsedYear : Number(new Date(date).getFullYear());
+      const seasonForMatch = Number.isNaN(seasonFromDate) ? season : seasonFromDate;
+      const created = await createMatchRecord({
+        date,
+        bestOf,
+        season: seasonForMatch,
+        firstBreakerPlayerID: starter,
+      });
+      const newMatchId: string | undefined = created?.MatchID;
       setMsg('Match aangemaakt ✔︎');
       // refresh lijst
-      const m = await API.listMatches(season);
-      const refreshed = (m as any).matches || [];
+      const refreshed = await getMatchesBySeason(seasonForMatch);
       setMatches(refreshed);
+      const refreshedSeasons = await getSeasons();
+      if (refreshedSeasons.length) setSeasons(refreshedSeasons);
+      setSeason(seasonForMatch);
       if (newMatchId) {
         setSelected(newMatchId);
       } else if (refreshed.length > 0) {
@@ -176,12 +239,7 @@ export default function App(){
         const entries: Array<[string, { nik: number; roel: number } | null]> = await Promise.all(
           matchesNeedingScores.map(async m => {
             try {
-              const data = await API.getMatch(m.MatchID);
-              const frames = ((data as any).frames || []) as Array<{
-                NikScore: number;
-                RoelScore: number;
-                WinnerPlayerID?: 'nik'|'roel'|'';
-              }>;
+              const frames = await getFramesForMatch(m.MatchID);
               const totals = frames.reduce(
                 (acc, frame) => {
                   const winner =

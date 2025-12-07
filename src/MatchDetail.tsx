@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { API } from './lib/api';
+import {
+  createBreak,
+  createFrame,
+  getMatchDetail,
+} from './data/scoresRepository';
 
 type Match = {
   MatchID: string;
@@ -9,7 +13,7 @@ type Match = {
   FirstBreakerPlayerID?: 'nik'|'roel'|'';
   WinnerPlayerID?: 'nik'|'roel'|'';
   Notes?: string;
-}
+};
 type Frame = {
   FrameID: string;
   MatchID: string;
@@ -19,7 +23,7 @@ type Frame = {
   WinnerPlayerID?: 'nik'|'roel'|'';
   BreakerPlayerID?: 'nik'|'roel'|'';
   Season: number;
-}
+};
 type Break = {
   BreakID: string;
   MatchID: string;
@@ -29,7 +33,7 @@ type Break = {
   Points: number;
   Season: number;
   FrameNo?: number;
-}
+};
 
 const playerLabel: Record<'nik'|'roel', string> = { nik: 'Nik', roel: 'Roel' };
 
@@ -54,7 +58,7 @@ export default function MatchDetail({
   const orderedFrames = useMemo(() => [...frames].sort((a,b)=> a.FrameNo - b.FrameNo), [frames]);
   const activeFrame = useMemo(() => findActiveFrame(orderedFrames), [orderedFrames]);
   const highestFrameNo = orderedFrames.length ? orderedFrames[orderedFrames.length - 1].FrameNo : 0;
-  const nextNo = activeFrame ? activeFrame.FrameNo : highestFrameNo + 1;
+  const nextNo = highestFrameNo + 1; // voorkom duplicate frame_no inserts
   const [nik, setNik] = useState<number>(0);
   const [roel, setRoel] = useState<number>(0);
   const suggestedBreaker = useMemo<'nik'|'roel'|''>(() => {
@@ -97,12 +101,12 @@ export default function MatchDetail({
     setBusy(true); setMsg(null);
     try {
       const targetFrame = frames.find(f => f.FrameNo === frameNoValue) || null;
-      await API.addBreak({
+      await createBreak({
         matchId,
         playerId: brPlayer,
         points: Number(brPoints),
         frameId: targetFrame?.FrameID,
-        frameNo: frameNoValue,
+        season: match?.Season,
       });
       // reset + herladen
       setBrPoints(10);
@@ -118,7 +122,7 @@ export default function MatchDetail({
 
   async function load(): Promise<{ match: Match; frames: Frame[]; breaks: Break[] }> {
     setMsg(null);
-    const r = await API.getMatch(matchId);
+    const r = await getMatchDetail(matchId);
     const matchData = (r as any).match as Match;
     const frameData = ((r as any).frames || []) as Frame[];
     const breakData = ((r as any).breaks || []) as Break[];
@@ -135,19 +139,23 @@ export default function MatchDetail({
     setBusy(true);
     setMsg(null);
     try {
-      await API.addFrame({
+      await createFrame({
         matchId,
         frameNo: nextNo,
-        NikScore: Number(nik),
-        RoelScore: Number(roel),
-        // BreakerPlayerID is optioneel; backend berekent ook om-en-om
-        BreakerPlayerID: breaker || undefined,
+        nikScore: Number(nik),
+        roelScore: Number(roel),
+        breakerId: breaker || undefined,
+        season: match?.Season,
       });
       setNik(0); setRoel(0);
       await load();
       setMsg('Frame toegevoegd ✔︎');
     } catch (err: any) {
-      setMsg('Fout: ' + err.message);
+      if (err?.message?.includes('duplicate key') || err?.code === '23505') {
+        setMsg('Fout: frame nummer bestaat al voor deze match (dup key).');
+      } else {
+        setMsg('Fout: ' + err.message);
+      }
     } finally { setBusy(false) }
   }
 
@@ -162,7 +170,7 @@ export default function MatchDetail({
     );
   }, [frames]);
 
-  if (!match) return <div className="card">Laden…</div>;
+  if (!match) return <div className="card">{msg ?? 'Laden…'}</div>;
 
   const formattedDate = new Date(match.Date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' });
   const nikStarted = match.FirstBreakerPlayerID === 'nik';
