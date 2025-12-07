@@ -31,10 +31,25 @@ export type Break = {
 export type Database = {
   public: {
     Tables: {
-      players: { Row: Player; Insert: Player; Update: Partial<Player> };
-      matches: { Row: Match; Insert: Omit<Match, 'id'> & { id?: string }; Update: Partial<Match> };
-      frames: { Row: Frame; Insert: Omit<Frame, 'id'> & { id?: string }; Update: Partial<Frame> };
-      breaks: { Row: Break; Insert: Omit<Break, 'id'> & { id?: string }; Update: Partial<Break> };
+      players: { Row: Player; Insert: Player; Update: Partial<Player>; Relationships: [] };
+      matches: {
+        Row: Match;
+        Insert: Omit<Match, 'id'> & { id?: string };
+        Update: Partial<Match>;
+        Relationships: [];
+      };
+      frames: {
+        Row: Frame;
+        Insert: Omit<Frame, 'id'> & { id?: string };
+        Update: Partial<Frame>;
+        Relationships: [];
+      };
+      breaks: {
+        Row: Break;
+        Insert: Omit<Break, 'id'> & { id?: string };
+        Update: Partial<Break>;
+        Relationships: [];
+      };
     };
     Views: {};
     Functions: {};
