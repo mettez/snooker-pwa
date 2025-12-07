@@ -22,7 +22,7 @@ type Match = {
   BestOf: number;
   FirstBreakerPlayerID?: 'nik'|'roel'|'';
   WinnerPlayerID?: 'nik'|'roel'|'';
-  Notes?: string;
+  Notes?: string | null;
   NikFrames?: number;
   RoelFrames?: number;
   NikScore?: number;
@@ -40,7 +40,18 @@ function generateDefaultSeasons(current: number) {
   return Array.from({ length: 7 }).map((_, idx) => current + 1 - idx);
 }
 
-function computeSeasonStats(matches: Match[], frames: any[], breaks: any[]): Stats {
+type FrameLite = {
+  MatchID: string;
+  NikScore: number;
+  RoelScore: number;
+  WinnerPlayerID?: 'nik'|'roel'|'';
+};
+type BreakLite = {
+  PlayerID: 'nik'|'roel';
+  Points: number;
+};
+
+function computeSeasonStats(matches: Match[], frames: FrameLite[], breaks: BreakLite[]): Stats {
   const stats: Stats = {
     nik: { matches: 0, frames: 0, hiBreak: 0, breaks10: 0 },
     roel:{ matches: 0, frames: 0, hiBreak: 0, breaks10: 0 },
@@ -48,7 +59,7 @@ function computeSeasonStats(matches: Match[], frames: any[], breaks: any[]): Sta
 
   const framesByMatch = frames.reduce<Record<string, { nik: number; roel: number }>>((acc, f) => {
     acc[f.MatchID] ||= { nik: 0, roel: 0 };
-    const winner =
+    const winner: 'nik' | 'roel' | null =
       f.WinnerPlayerID === 'nik' || f.WinnerPlayerID === 'roel'
         ? f.WinnerPlayerID
         : f.NikScore === f.RoelScore
@@ -71,7 +82,7 @@ function computeSeasonStats(matches: Match[], frames: any[], breaks: any[]): Sta
   }
 
   for (const f of frames) {
-    const winner =
+    const winner: 'nik' | 'roel' | null =
       f.WinnerPlayerID === 'nik' || f.WinnerPlayerID === 'roel'
         ? f.WinnerPlayerID
         : f.NikScore === f.RoelScore
@@ -139,8 +150,8 @@ export default function App(){
     ])
       .then(([matchesData, framesData, breaksData])=>{
         if (!alive) return;
-        setMatches(matchesData);
-        setStats(computeSeasonStats(matchesData as any, framesData as any, breaksData as any));
+        setMatches(matchesData as Match[]);
+        setStats(computeSeasonStats(matchesData as Match[], framesData as FrameLite[], breaksData as BreakLite[]));
       })
       .catch(e=> setMsg('Fout: ' + e.message))
       .finally(()=> setLoading(false));
@@ -180,7 +191,7 @@ export default function App(){
       setMsg('Match aangemaakt ✔︎');
       // refresh lijst
       const refreshed = await getMatchesBySeason(seasonForMatch);
-      setMatches(refreshed);
+      setMatches(refreshed as Match[]);
       const refreshedSeasons = await getSeasons();
       if (refreshedSeasons.length) setSeasons(refreshedSeasons);
       setSeason(seasonForMatch);
@@ -242,7 +253,7 @@ export default function App(){
               const frames = await getFramesForMatch(m.MatchID);
               const totals = frames.reduce(
                 (acc, frame) => {
-                  const winner =
+                  const winner: 'nik' | 'roel' | null =
                     frame.WinnerPlayerID === 'nik' || frame.WinnerPlayerID === 'roel'
                       ? frame.WinnerPlayerID
                       : frame.NikScore === frame.RoelScore
