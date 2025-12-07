@@ -3,6 +3,8 @@ import {
   createBreak,
   createFrame,
   getMatchDetail,
+  updateBreak,
+  updateFrame,
 } from './data/scoresRepository';
 
 type Match = {
@@ -53,6 +55,11 @@ export default function MatchDetail({
   const [breaks, setBreaks] = useState<Break[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [editingFrameId, setEditingFrameId] = useState<string | null>(null);
+  const [editNik, setEditNik] = useState(0);
+  const [editRoel, setEditRoel] = useState(0);
+  const [editingBreakId, setEditingBreakId] = useState<string | null>(null);
+  const [editBreakPoints, setEditBreakPoints] = useState<number>(10);
 
   // formulier voor nieuw frame
   const orderedFrames = useMemo(() => [...frames].sort((a,b)=> a.FrameNo - b.FrameNo), [frames]);
@@ -156,7 +163,34 @@ export default function MatchDetail({
       } else {
         setMsg('Fout: ' + err.message);
       }
-    } finally { setBusy(false) }
+    } finally { setBusy(false); }
+  }
+
+  async function applyFrameEdit(frameId: string) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      await updateFrame({ frameId, nikScore: Number(editNik), roelScore: Number(editRoel) });
+      setEditingFrameId(null);
+      await load();
+      setMsg('Frame bijgewerkt ✔︎');
+    } catch (err: any) {
+      setMsg('Fout: ' + err.message);
+    } finally { setBusy(false); }
+  }
+
+  async function applyBreakEdit(breakId: string) {
+    if (Number(editBreakPoints) < 10) { setMsg('Fout: break moet ≥ 10 zijn'); return; }
+    setBusy(true);
+    setMsg(null);
+    try {
+      await updateBreak({ breakId, points: Number(editBreakPoints) });
+      setEditingBreakId(null);
+      await load();
+      setMsg('Break bijgewerkt ✔︎');
+    } catch (err: any) {
+      setMsg('Fout: ' + err.message);
+    } finally { setBusy(false); }
   }
 
   const frameTotals = useMemo(() => {
@@ -216,21 +250,68 @@ export default function MatchDetail({
           <div className="frame-timeline">
             {orderedFrames.map(frame => {
               const winner = getFrameWinner(frame);
+              const isEditing = editingFrameId === frame.FrameID;
               return (
                 <div className="frame-timeline-row" key={frame.FrameID}>
                   <div className="frame-card">
                     <div className="frame-card-header">
                       <div className="frame-card-title">Frame {frame.FrameNo}</div>
+                      <button
+                        className="btn btn-ghost btn-xs"
+                        onClick={() => {
+                          if (isEditing) {
+                            setEditingFrameId(null);
+                            return;
+                          }
+                          setEditingFrameId(frame.FrameID);
+                          setEditNik(frame.NikScore);
+                          setEditRoel(frame.RoelScore);
+                        }}
+                      >
+                        {isEditing ? 'Annuleer' : 'Edit'}
+                      </button>
                     </div>
                     <div className="frame-card-body">
-                      <div className={`match-score-line ${winner === 'roel' ? 'match-score-line-winner-roel' : ''}`}>
-                        <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
-                        <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
-                      </div>
-                      <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
-                        <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
-                        <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
-                      </div>
+                      {isEditing ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="flex-1 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
+                            <input
+                              type="number"
+                              className="input flex-1"
+                              value={editRoel}
+                              onChange={e => setEditRoel(Number(e.target.value))}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="flex-1 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
+                            <input
+                              type="number"
+                              className="input flex-1"
+                              value={editNik}
+                              onChange={e => setEditNik(Number(e.target.value))}
+                            />
+                          </div>
+                          <button
+                            className="btn btn-primary btn-sm w-full"
+                            disabled={busy}
+                            onClick={() => applyFrameEdit(frame.FrameID)}
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className={`match-score-line ${winner === 'roel' ? 'match-score-line-winner-roel' : ''}`}>
+                            <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
+                            <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
+                          </div>
+                          <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
+                            <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
+                            <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -314,6 +395,7 @@ export default function MatchDetail({
                 </div>
                 <div className="space-y-2">
                   {playerBreaks.map(b => {
+                    const isEditingBreak = editingBreakId === b.BreakID;
                     const frameId = b.FrameID ?? (b as any).FrameId;
                     const frameLabel = b.FrameNo ?? (frameId ? frames.find(f=>f.FrameID===frameId)?.FrameNo : undefined);
                     return (
@@ -321,8 +403,44 @@ export default function MatchDetail({
                         key={b.BreakID}
                         className={`break-pill ${player === 'nik' ? 'break-pill-nik' : 'break-pill-roel'}`}
                       >
-                        <span className="break-pill-value">{b.Points}</span>
-                        <span className="muted text-xs">{frameLabel ? `Frame ${frameLabel}` : 'Frame ?'}</span>
+                        {isEditingBreak ? (
+                          <div className="flex items-center gap-2 w-full">
+                            <input
+                              type="number"
+                              className="input flex-1"
+                              value={editBreakPoints}
+                              min={10}
+                              onChange={e => setEditBreakPoints(Number(e.target.value))}
+                            />
+                            <button
+                              className="btn btn-primary btn-xs"
+                              disabled={busy}
+                              onClick={() => applyBreakEdit(b.BreakID)}
+                            >
+                              Apply
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-xs"
+                              onClick={() => setEditingBreakId(null)}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="break-pill-value">{b.Points}</span>
+                            <span className="muted text-xs">{frameLabel ? `Frame ${frameLabel}` : 'Frame ?'}</span>
+                            <button
+                              className="btn btn-ghost btn-xs"
+                              onClick={() => {
+                                setEditingBreakId(b.BreakID);
+                                setEditBreakPoints(b.Points);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </>
+                        )}
                       </div>
                     );
                   })}

@@ -165,6 +165,34 @@ export async function createBreak(input: {
   ]);
   if (error) throw error;
 }
+
+export async function updateFrame(input: {
+  frameId: string;
+  nikScore: number;
+  roelScore: number;
+}) {
+  type FrameUpdate = Database['public']['Tables']['frames']['Update'];
+  const { error } = await supabase
+    .from('frames')
+    .update({
+      nik_score: input.nikScore,
+      roel_score: input.roelScore,
+    } as FrameUpdate)
+    .eq('id', input.frameId);
+  if (error) throw error;
+}
+
+export async function updateBreak(input: {
+  breakId: string;
+  points: number;
+}) {
+  type BreakUpdate = Database['public']['Tables']['breaks']['Update'];
+  const { error } = await supabase
+    .from('breaks')
+    .update({ points: input.points } as BreakUpdate)
+    .eq('id', input.breakId);
+  if (error) throw error;
+}
 export async function getSeasons(): Promise<number[]> {
   const { data, error } = await supabase
     .from('matches')
