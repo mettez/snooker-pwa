@@ -279,6 +279,7 @@ export default function MatchDetail({
                               type="number"
                               className="input flex-1"
                               value={editRoel}
+                              aria-label="Roel waarde"
                               onChange={e => setEditRoel(Number(e.target.value))}
                             />
                           </div>
@@ -288,6 +289,7 @@ export default function MatchDetail({
                               type="number"
                               className="input flex-1"
                               value={editNik}
+                              aria-label="Nik waarde"
                               onChange={e => setEditNik(Number(e.target.value))}
                             />
                           </div>
@@ -345,11 +347,23 @@ export default function MatchDetail({
             <div className="row">
               <div className="flex-1 space-y-2">
                 <div className="label">Nik</div>
-                <input type="number" className="input" value={nik} onChange={e => setNik(Number(e.target.value))} />
+                <input
+                  type="number"
+                  className="input"
+                  value={nik}
+                  aria-label="Nik score"
+                  onChange={e => setNik(Number(e.target.value))}
+                />
               </div>
               <div className="flex-1 space-y-2">
                 <div className="label">Roel</div>
-                <input type="number" className="input" value={roel} onChange={e => setRoel(Number(e.target.value))} />
+                <input
+                  type="number"
+                  className="input"
+                  value={roel}
+                  aria-label="Roel score"
+                  onChange={e => setRoel(Number(e.target.value))}
+                />
               </div>
             </div>
 
@@ -366,19 +380,31 @@ export default function MatchDetail({
         {!reachedBestOf && (
           <div className="item space-y-4">
             <div className="flex flex-wrap gap-2">
-              <button type="button"
-                      className={`btn ${brPlayer==='nik' ? 'btn-primary' : 'btn-ghost'}`}
-                      onClick={()=> setBrPlayer('nik')}>Nik</button>
-              <button type="button"
-                      className={`btn ${brPlayer==='roel' ? 'btn-primary' : 'btn-ghost'}`}
-                      onClick={()=> setBrPlayer('roel')}>Roel</button>
+                           <button
+                type="button"
+                className={`btn ${brPlayer === 'nik' ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => setBrPlayer('nik')}
+              >
+                Nik
+              </button>
+              <button
+                type="button"
+                className={`btn ${brPlayer === 'roel' ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => setBrPlayer('roel')}
+              >
+                Roel
+              </button>
             </div>
-            <div>
+            
               <div className="label">Punten (≥ 10)</div>
-              <input type="number" min={10} className="input"
-                     value={brPoints} onChange={e=> setBrPoints(Number(e.target.value))} />
-            </div>
-
+              <input
+                type="number"
+                min={10}
+                className="input"
+                value={brPoints}
+                aria-label="Punten (min 10)"
+                onChange={e => setBrPoints(Number(e.target.value))}
+              />
             <div>
               <div className="label">Frame nr.</div>
               <input
@@ -387,7 +413,7 @@ export default function MatchDetail({
                 className="input"
                 placeholder={`bv. ${activeFrame ? activeFrame.FrameNo : nextNo}`}
                 value={brFrameNo}
-                onChange={e=> setBrFrameNo(e.target.value === '' ? '' : Number(e.target.value))}
+                onChange={e => setBrFrameNo(e.target.value === '' ? '' : Number(e.target.value))}
               />
               <div className="muted text-xs">
                 Actief frame: {activeFrame ? `Frame ${activeFrame.FrameNo}` : `Frame ${nextNo} (wordt aangemaakt bij opslaan)`}
@@ -425,6 +451,7 @@ export default function MatchDetail({
                               className="input flex-1"
                               value={editBreakPoints}
                               min={10}
+                              aria-label="Break punten"
                               onChange={e => setEditBreakPoints(Number(e.target.value))}
                             />
                             <button

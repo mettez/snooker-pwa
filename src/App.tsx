@@ -310,8 +310,11 @@ export default function App(){
             <h1 className="h1">SnookerScore</h1>
           </div>
           <div className="space-y-2">
-            <span className="label">Seizoen</span>
+            <label className="label" htmlFor="season-select">
+              Seizoen
+            </label>
             <select
+              id="season-select"
               className="input w-32"
               value={season}
               onChange={e => setSeason(Number(e.target.value))}
@@ -381,12 +384,27 @@ export default function App(){
                 {showNewMatch && (
                   <div className="p-4 border-t border-white/5 space-y-4">
                     <div>
-                      <div className="label">Datum</div>
-                      <input type="date" className="input" value={date} onChange={e=> setDate(e.target.value)} />
+                      <label className="label" htmlFor="match-date">
+                        Datum
+                      </label>
+                      <input
+                        id="match-date"
+                        type="date"
+                        className="input"
+                        value={date}
+                        onChange={e => setDate(e.target.value)}
+                      />
                     </div>
                     <div>
-                      <div className="label">Best of</div>
-                      <select className="input" value={bestOf} onChange={e=> setBestOf(Number(e.target.value))}>
+                      <label className="label" htmlFor="bestof-select">
+                        Best of
+                      </label>
+                      <select
+                        id="bestof-select"
+                        className="input"
+                        value={bestOf}
+                        onChange={e => setBestOf(Number(e.target.value))}
+                      >
                         <option value={3}>3</option>
                         <option value={5}>5</option>
                         <option value={7}>7</option>
