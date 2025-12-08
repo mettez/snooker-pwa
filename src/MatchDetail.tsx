@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   createBreak,
-  createFrame,
   getMatchDetail,
+  getOrCreateActiveFrame,
   updateBreak,
   updateFrame,
 } from './data/scoresRepository';
@@ -86,7 +86,7 @@ export default function MatchDetail({
 
   useEffect(() => {
     const suggested = activeFrame ? activeFrame.FrameNo : nextNo;
-    setBrFrameNo(prev => (prev === '' ? suggested : prev));
+    setBrFrameNo(suggested);
   }, [activeFrame, nextNo]);
 
   function findActiveFrame(list: Frame[]) {
@@ -102,17 +102,15 @@ export default function MatchDetail({
   async function addTenPlus(e: React.FormEvent) {
     e.preventDefault();
     if (Number(brPoints) < 10) { setMsg('Fout: break moet ≥ 10 zijn'); return; }
-    const frameNoValueRaw = brFrameNo === '' ? (activeFrame ? activeFrame.FrameNo : nextNo) : Number(brFrameNo);
-    if (Number.isNaN(frameNoValueRaw) || frameNoValueRaw <= 0) { setMsg('Fout: vul een geldig frame nummer in'); return; }
-    const frameNoValue = frameNoValueRaw;
     setBusy(true); setMsg(null);
     try {
-      const targetFrame = frames.find(f => f.FrameNo === frameNoValue) || null;
+      const frameFromInput = brFrameNo === '' ? null : frames.find(f => f.FrameNo === Number(brFrameNo));
+      const targetFrame = frameFromInput ?? (await getOrCreateActiveFrame(matchId, match?.Season));
       await createBreak({
         matchId,
         playerId: brPlayer,
         points: Number(brPoints),
-        frameId: targetFrame?.FrameID,
+        frameId: targetFrame.FrameID,
         season: match?.Season,
       });
       // reset + herladen
@@ -146,23 +144,18 @@ export default function MatchDetail({
     setBusy(true);
     setMsg(null);
     try {
-      await createFrame({
-        matchId,
-        frameNo: nextNo,
+      const target = activeFrame ?? (await getOrCreateActiveFrame(matchId, match?.Season));
+      await updateFrame({
+        frameId: target.FrameID,
         nikScore: Number(nik),
         roelScore: Number(roel),
         breakerId: breaker || undefined,
-        season: match?.Season,
       });
       setNik(0); setRoel(0);
       await load();
-      setMsg('Frame toegevoegd ✔︎');
+      setMsg('Frame opgeslagen ✔︎');
     } catch (err: any) {
-      if (err?.message?.includes('duplicate key') || err?.code === '23505') {
-        setMsg('Fout: frame nummer bestaat al voor deze match (dup key).');
-      } else {
-        setMsg('Fout: ' + err.message);
-      }
+      setMsg('Fout: ' + err.message);
     } finally { setBusy(false); }
   }
 
@@ -251,6 +244,12 @@ export default function MatchDetail({
             {orderedFrames.map(frame => {
               const winner = getFrameWinner(frame);
               const isEditing = editingFrameId === frame.FrameID;
+              const frameBreaks = breaks.filter(b => {
+                const fid = b.FrameID ?? (b as any).FrameId;
+                return fid === frame.FrameID;
+              });
+              const roelBreaks = frameBreaks.filter(b => b.PlayerID === 'roel');
+              const nikBreaks = frameBreaks.filter(b => b.PlayerID === 'nik');
               return (
                 <div className="frame-timeline-row" key={frame.FrameID}>
                   <div className="frame-card">
@@ -306,10 +305,26 @@ export default function MatchDetail({
                             <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
                             <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
                           </div>
+                          {roelBreaks.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              <span className="muted text-[10px]">10+ breaks:</span>
+                              {roelBreaks.map(b => (
+                                <span key={b.BreakID} className="chip chip-neutral text-[10px]">{b.Points}</span>
+                              ))}
+                            </div>
+                          )}
                           <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
                             <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
                             <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
                           </div>
+                          {nikBreaks.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              <span className="muted text-[10px]">10+ breaks:</span>
+                              {nikBreaks.map(b => (
+                                <span key={b.BreakID} className="chip chip-neutral text-[10px]">{b.Points}</span>
+                              ))}
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

@@ -133,7 +133,7 @@ export async function createFrame(input: {
   season?: number;
 }) {
   type FrameInsert = Database['public']['Tables']['frames']['Insert'];
-  const { error } = await supabase.from('frames').insert([
+  const { data, error } = await supabase.from('frames').insert([
     {
       match_id: input.matchId,
       frame_no: input.frameNo,
@@ -142,8 +142,9 @@ export async function createFrame(input: {
       breaker_id: input.breakerId ?? null,
       season: input.season ?? new Date().getFullYear(),
     } as FrameInsert,
-  ]);
+  ]).select().single();
   if (error) throw error;
+  return data ? mapFrame(data) : null;
 }
 
 export async function createBreak(input: {
@@ -170,13 +171,22 @@ export async function updateFrame(input: {
   frameId: string;
   nikScore: number;
   roelScore: number;
+  breakerId?: 'nik' | 'roel';
 }) {
   type FrameUpdate = Database['public']['Tables']['frames']['Update'];
+  const winner =
+    input.nikScore === input.roelScore
+      ? null
+      : input.nikScore > input.roelScore
+        ? 'nik'
+        : 'roel';
   const { error } = await supabase
     .from('frames')
     .update({
       nik_score: input.nikScore,
       roel_score: input.roelScore,
+      breaker_id: input.breakerId ?? null,
+      winner_id: winner,
     } as FrameUpdate)
     .eq('id', input.frameId);
   if (error) throw error;
@@ -192,6 +202,43 @@ export async function updateBreak(input: {
     .update({ points: input.points } as BreakUpdate)
     .eq('id', input.breakId);
   if (error) throw error;
+}
+
+export async function getOrCreateActiveFrame(matchId: string, season?: number) {
+  const { data: frames, error } = await supabase
+    .from('frames')
+    .select('*')
+    .eq('match_id', matchId)
+    .order('frame_no', { ascending: true });
+  if (error) throw error;
+  const mapped = (frames ?? []).map(mapFrame);
+  const active = mapped.find(f => !f.WinnerPlayerID);
+  if (active) return active;
+  const nextNo = mapped.length ? Math.max(...mapped.map(f => f.FrameNo)) + 1 : 1;
+  try {
+    const created = await createFrame({
+      matchId,
+      frameNo: nextNo,
+      nikScore: 0,
+      roelScore: 0,
+      breakerId: undefined,
+      season,
+    });
+    if (created) return created;
+  } catch (err: any) {
+    const dup = err?.code === '23505' || (typeof err?.message === 'string' && err.message.includes('duplicate key'));
+    if (!dup) throw err;
+    // duplicate: refetch that frame
+    const { data: refetch, error: refetchErr } = await supabase
+      .from('frames')
+      .select('*')
+      .eq('match_id', matchId)
+      .eq('frame_no', nextNo)
+      .maybeSingle();
+    if (refetchErr) throw refetchErr;
+    if (refetch) return mapFrame(refetch);
+  }
+  throw new Error('Kon actieve frame niet bepalen');
 }
 export async function getSeasons(): Promise<number[]> {
   const { data, error } = await supabase
