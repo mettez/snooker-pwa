@@ -202,31 +202,34 @@ export default function MatchDetail({
   const formattedDate = new Date(match.Date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' });
   const nikStarted = match.FirstBreakerPlayerID === 'nik';
   const roelStarted = match.FirstBreakerPlayerID === 'roel';
+  const matchWinner = frameTotals.nik > frameTotals.roel ? 'nik' : frameTotals.roel > frameTotals.nik ? 'roel' : null;
 
   return (
     <div className="space-y-6">
-      <div className="match-summary-panel">
-        <div className="match-summary-top">
-          <div>
-            <div className="section-label">Match</div>
-            <div className="match-summary-date">{formattedDate}</div>
-            <div className="muted text-xs mt-1">Best of {match.BestOf}</div>
+      <div className="match-summary-panel detail-summary">
+        <div className="detail-chip">Best of {match.BestOf}</div>
+        <div className="detail-face-row">
+          <div className="detail-player">
+            <div className={['detail-avatar', matchWinner === 'nik' ? '' : 'detail-avatar-muted'].join(' ')}>
+              {nikStarted && <span className="match-starter-dot" aria-hidden="true"></span>}
+              <img src="/Nik.png" alt="Nik" />
+            </div>
+            <div className="detail-player-name">Nik</div>
           </div>
-        </div>
-        <div className="match-card-scores">
-          <div className={`match-score-line ${frameTotals.roel > frameTotals.nik ? 'match-score-line-winner-roel' : ''}`}>
-            <span className="flex items-center gap-2 text-xs font-semibold uppercase text-amber-200">
-              {playerLabel.roel}
-              {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
-            </span>
-            <span className="match-score-value match-score-value-roel">{frameTotals.roel}</span>
+          <div className="detail-score-center">
+            <div className="detail-score">
+              <span className={matchWinner === 'nik' ? 'text-[var(--primary)]' : ''}>{frameTotals.nik}</span>
+              <span className="detail-score-sep">-</span>
+              <span className={matchWinner === 'roel' ? 'text-[var(--primary)]' : ''}>{frameTotals.roel}</span>
+            </div>
+            <div className="detail-score-sub">Eindstand</div>
           </div>
-          <div className={`match-score-line ${frameTotals.nik > frameTotals.roel ? 'match-score-line-winner-nik' : ''}`}>
-            <span className="flex items-center gap-2 text-xs font-semibold uppercase text-sky-300">
-              {playerLabel.nik}
-              {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
-            </span>
-            <span className="match-score-value match-score-value-nik">{frameTotals.nik}</span>
+          <div className="detail-player">
+            <div className={['detail-avatar', matchWinner === 'roel' ? '' : 'detail-avatar-muted'].join(' ')}>
+              {roelStarted && <span className="match-starter-dot" aria-hidden="true"></span>}
+              <img src="/Roel.png" alt="Roel" />
+            </div>
+            <div className="detail-player-name">Roel</div>
           </div>
         </div>
       </div>
@@ -236,6 +239,7 @@ export default function MatchDetail({
       <section className="section">
         <div className="section-heading">
           <h3 className="h2">Frames</h3>
+          <span className="frame-count-chip">{orderedFrames.length} gespeeld</span>
         </div>
         {orderedFrames.length === 0 ? (
           <div className="item muted">Nog geen frames.</div>
@@ -293,40 +297,52 @@ export default function MatchDetail({
                               onChange={e => setEditNik(Number(e.target.value))}
                             />
                           </div>
-                          <button
-                            className="btn btn-primary btn-sm w-full"
-                            disabled={busy}
-                            onClick={() => applyFrameEdit(frame.FrameID)}
-                          >
-                            Apply
+                            <button
+                              className="btn btn-primary btn-sm w-full"
+                              disabled={busy}
+                              onClick={() => applyFrameEdit(frame.FrameID)}
+                            >
+                              Apply
                           </button>
                         </div>
                       ) : (
                         <>
-                          <div className={`match-score-line ${winner === 'roel' ? 'match-score-line-winner-roel' : ''}`}>
-                            <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-amber-200">{playerLabel.roel}</span>
-                            <span className="match-score-value match-score-value-roel">{frame.RoelScore}</span>
-                          </div>
-                          {roelBreaks.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              <span className="muted text-[10px]">10+ breaks:</span>
-                              {roelBreaks.map(b => (
-                                <span key={b.BreakID} className="chip chip-neutral text-[10px]">{b.Points}</span>
-                              ))}
+                          <div className="frame-score-row">
+                            <div className={`frame-score-value ${winner === 'nik' ? 'frame-score-primary' : 'frame-score-muted'}`}>
+                              {frame.NikScore}
                             </div>
-                          )}
-                          <div className={`match-score-line ${winner === 'nik' ? 'match-score-line-winner-nik' : ''}`}>
-                            <span className="flex items-center gap-2 text-[10px] font-semibold uppercase text-sky-300">{playerLabel.nik}</span>
-                            <span className="match-score-value match-score-value-nik">{frame.NikScore}</span>
-                          </div>
-                          {nikBreaks.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              <span className="muted text-[10px]">10+ breaks:</span>
-                              {nikBreaks.map(b => (
-                                <span key={b.BreakID} className="chip chip-neutral text-[10px]">{b.Points}</span>
-                              ))}
+                            <span className="frame-score-sep">-</span>
+                            <div className={`frame-score-value ${winner === 'roel' ? 'frame-score-primary' : 'frame-score-muted'}`}>
+                              {frame.RoelScore}
                             </div>
-                          )}
+                          </div>
+                          <div className="frame-divider" />
+                          <div className="frame-breaks-row">
+                            <div className="frame-break-col">
+                              <div className="frame-break-label">Nik</div>
+                              {nikBreaks.length > 0 ? (
+                                <div className="frame-break-chips">
+                                  {nikBreaks.map(b => (
+                                    <span key={b.BreakID} className="frame-break-chip">{b.Points}</span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="frame-break-empty">Geen breaks &gt; 10</div>
+                              )}
+                            </div>
+                            <div className="frame-break-col">
+                              <div className="frame-break-label">Roel</div>
+                              {roelBreaks.length > 0 ? (
+                                <div className="frame-break-chips">
+                                  {roelBreaks.map(b => (
+                                    <span key={b.BreakID} className="frame-break-chip">{b.Points}</span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="frame-break-empty">Geen breaks &gt; 10</div>
+                              )}
+                            </div>
+                          </div>
                         </>
                       )}
                     </div>
@@ -428,13 +444,23 @@ export default function MatchDetail({
         <div className="break-grid mt-3">
           {(['nik','roel'] as const).map(player => {
             const playerBreaks = breaks.filter(b => b.PlayerID === player);
+            const totalBreaks = playerBreaks.length;
             return (
               <div key={player} className="break-player-card">
-                <div className="break-player-header">
-                  <span>{playerLabel[player]}</span>
-                  <span className="muted text-xs">{playerBreaks.length} break(s)</span>
+                <div className="break-player-top">
+                  <div className="break-player-avatar">
+                    <img src={player === 'nik' ? '/Nik.png' : '/Roel.png'} alt={playerLabel[player]} />
+                  </div>
+                  <div>
+                    <div className="break-player-name">{playerLabel[player]}</div>
+                  </div>
                 </div>
-                <div className="space-y-2">
+                <div className="break-footer">
+                  <span>Totaal breaks</span>
+                  <span className="font-bold text-[var(--text)]">{totalBreaks}</span>
+                </div>
+
+                <div className="flex flex-col gap-2 mt-2">
                   {playerBreaks.map(b => {
                     const isEditingBreak = editingBreakId === b.BreakID;
                     const frameId = b.FrameID ?? (b as any).FrameId;
@@ -486,7 +512,6 @@ export default function MatchDetail({
                       </div>
                     );
                   })}
-                  {playerBreaks.length === 0 && <div className="muted text-xs">Nog geen 10+ breaks.</div>}
                 </div>
               </div>
             );

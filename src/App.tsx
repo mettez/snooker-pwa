@@ -110,9 +110,9 @@ export default function App(){
   const [msg, setMsg] = useState<string | null>(null);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [matchScores, setMatchScores] = useState<Record<string, { nik: number; roel: number } | null>>({});
-  const [showStats, setShowStats] = useState(false);
+  const [showStats, setShowStats] = useState(true);
   const [showNewMatch, setShowNewMatch] = useState(false);
-  const [showRecentMatches, setShowRecentMatches] = useState(false);
+  const [showRecentMatches, setShowRecentMatches] = useState(true);
 
   // formulier voor nieuwe match
   const [date, setDate] = useState(()=> new Date().toISOString().slice(0,10));
@@ -289,12 +289,23 @@ export default function App(){
     return (
       <div className="app-shell">
         <div className="container space-y-6">
-          <header className="hero">
-            <div>
-              <h1 className="h1">SnookerScore</h1>
-              <div className="muted">Seizoen {season}</div>
-            </div>
-            <button className="btn btn-ghost btn-sm" onClick={()=> setSelected(null)}>Terug</button>
+          <header className="detail-bar">
+            <button
+              type="button"
+              className="text-white text-lg font-semibold hover:text-[var(--primary)]"
+              onClick={()=> setSelected(null)}
+              aria-label="Terug"
+            >
+              ←
+            </button>
+            <div className="detail-bar-title">Wedstrijd Details</div>
+            <button
+              type="button"
+              className="detail-bar-action"
+              onClick={()=> setSelected(null)}
+            >
+              Gereed
+            </button>
           </header>
           <MatchDetail matchId={selected} />
         </div>
@@ -305,28 +316,104 @@ export default function App(){
   return (
     <div className="app-shell">
       <div className="container">
-        <header className="hero">
-          <div>
-            <h1 className="h1">SnookerScore</h1>
+        <header className="topbar">
+          <div className="brand">
+            <div className="logo-mark" aria-label="SnookerScore logo" />
+            <span className="logo-text">SnookerScore</span>
           </div>
-          <div className="space-y-2">
-            <label className="label" htmlFor="season-select">
-              Seizoen
-            </label>
-            <select
-              id="season-select"
-              className="input w-32"
-              value={season}
-              onChange={e => setSeason(Number(e.target.value))}
+          <label className="sr-only" htmlFor="season-select">Seizoen</label>
+          <select
+            id="season-select"
+            className="season-select"
+            value={season}
+            onChange={e => setSeason(Number(e.target.value))}
+          >
+            {seasons.map(y => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </header>
+
+        <header className="hero">
+          <div className="hero-cta-minimal">
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setShowNewMatch(true);
+                const target = document.getElementById('new-match');
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
             >
-              {seasons.map(y => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              Start nieuwe match
+            </button>
           </div>
         </header>
+
+        {showNewMatch && (
+          <section className="section" id="new-match">
+            <div className="section-heading">
+              <h3 className="h2">Nieuwe match</h3>
+              <button className="btn btn-ghost btn-sm" onClick={()=> setShowNewMatch(false)}>Sluiten</button>
+            </div>
+            <div className="item new-match-card">
+              <div className="new-match-left">
+                <div className="space-y-2">
+                  <div className="label">Datum</div>
+                  <input
+                    id="match-date"
+                    type="date"
+                    className="input"
+                    value={date}
+                    onChange={e => setDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="label">Break-off</div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className={`break-choice ${starter==='nik'?'break-choice-active':''}`}
+                      onClick={()=> setStarter('nik')}
+                    >
+                      <span className={`break-avatar ${starter==='nik' ? '' : 'break-avatar-muted'}`}>
+                        <img src="/Nik.png" alt="Nik" />
+                      </span>
+                      <span>Nik</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`break-choice ${starter==='roel'?'break-choice-active':''}`}
+                      onClick={()=> setStarter('roel')}
+                    >
+                      <span className={`break-avatar ${starter==='roel' ? '' : 'break-avatar-muted'}`}>
+                        <img src="/Roel.png" alt="Roel" />
+                      </span>
+                      <span>Roel</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="new-match-cta">
+                  <button className="btn btn-primary" onClick={createMatch as any}>Aanmaken</button>
+                </div>
+              </div>
+              <div className="new-match-right">
+                <div className="label text-right md:text-left">Best of</div>
+                <select
+                  id="bestof-select"
+                  className="input"
+                  value={bestOf}
+                  onChange={e => setBestOf(Number(e.target.value))}
+                >
+                  <option value={3}>3</option>
+                  <option value={5}>5</option>
+                  <option value={7}>7</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        )}
 
         {loading && <div className="item">Laden…</div>}
         {msg && <div className="item">{msg}</div>}
@@ -335,105 +422,42 @@ export default function App(){
           <div className="stack">
             {statsForDisplay && (
               <section className="section">
-                <div className="accordion">
-                  <button
-                    type="button"
-                    className="accordion-header"
-                    aria-expanded={showStats}
-                    onClick={()=> setShowStats(prev => !prev)}
-                  >
-                    <h2 className="h2">Head-to-head</h2>
-                    <span className={`accordion-icon ${showStats ? 'accordion-icon-open' : ''}`} aria-hidden="true">⌃</span>
-                  </button>
-                  {showStats && (
-                    <div className="p-4 border-t border-white/5">
-                      <div className="kpi-grid">
-                        {KPI_FIELDS.map(metric => (
-                          <div key={metric.key} className="kpi-card">
-                            <div className="kpi-card-title">{metric.label}</div>
-                            <div className="kpi-card-values">
-                              <span className={`pill pill-nik ${statsForDisplay.nik[metric.key] >= statsForDisplay.roel[metric.key] ? 'pill-highlight-nik' : ''}`}>
-                                Nik
-                                <span>{statsForDisplay.nik[metric.key]}</span>
-                              </span>
-                              <span className={`pill pill-roel ${statsForDisplay.roel[metric.key] >= statsForDisplay.nik[metric.key] ? 'pill-highlight-roel' : ''}`}>
-                                Roel
-                                <span>{statsForDisplay.roel[metric.key]}</span>
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <div className="section-heading">
+                  <h3 className="h2">Head To Head</h3>
                 </div>
+                {showStats && (
+                  <div className="stats-grid">
+                    {[
+                      { key: 'matches' as const, label: 'Wins', icon: '🏆', unit: 'matches' },
+                      { key: 'frames' as const, label: 'Frames', icon: '🔲', unit: 'won' },
+                      { key: 'breaks10' as const, label: '10+ Breaks', icon: '🔥', unit: 'times' },
+                      { key: 'hiBreak' as const, label: 'High Break', icon: '✶', unit: 'points' },
+                    ].map(metric => (
+                      <div key={metric.key} className="stat-card">
+                        <div className="stat-head">
+                          <span className="stat-icon" aria-hidden="true">{metric.icon}</span>
+                          {metric.label}
+                        </div>
+                        <div className="stat-body">
+                          <div className="stat-player">
+                            <div className="stat-player-name">Nik</div>
+                            <div className="stat-value">{statsForDisplay.nik[metric.key]}</div>
+                            <div className="stat-sub">{metric.unit}</div>
+                          </div>
+                          <div className="stat-sep">-</div>
+                          <div className="stat-player">
+                            <div className="stat-player-name">Roel</div>
+                            <div className="stat-value">{statsForDisplay.roel[metric.key]}</div>
+                            <div className="stat-sub">{metric.unit}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </section>
             )}
 
-            <section className="section">
-              <div className="accordion">
-                <button
-                  type="button"
-                  className="accordion-header"
-                  aria-expanded={showNewMatch}
-                  onClick={()=> setShowNewMatch(prev => !prev)}
-                >
-                  <h2 className="h2">Nieuwe match</h2>
-                  <span className={`accordion-icon ${showNewMatch ? 'accordion-icon-open' : ''}`} aria-hidden="true">⌃</span>
-                </button>
-                {showNewMatch && (
-                  <div className="p-4 border-t border-white/5 space-y-4">
-                    <div>
-                      <label className="label" htmlFor="match-date">
-                        Datum
-                      </label>
-                      <input
-                        id="match-date"
-                        type="date"
-                        className="input"
-                        value={date}
-                        onChange={e => setDate(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="label" htmlFor="bestof-select">
-                        Best of
-                      </label>
-                      <select
-                        id="bestof-select"
-                        className="input"
-                        value={bestOf}
-                        onChange={e => setBestOf(Number(e.target.value))}
-                      >
-                        <option value={3}>3</option>
-                        <option value={5}>5</option>
-                        <option value={7}>7</option>
-                      </select>
-                    </div>
-                    <div>
-                      <div className="label">Break-off</div>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          className={`btn ${starter==='nik'?'btn-primary':'btn-ghost'}`}
-                          onClick={()=> setStarter('nik')}
-                        >
-                          Nik
-                        </button>
-                        <button
-                          type="button"
-                          className={`btn ${starter==='roel'?'btn-primary':'btn-ghost'}`}
-                          onClick={()=> setStarter('roel')}
-                        >
-                          Roel
-                        </button>
-                      </div>
-                    </div>
-                    <button className="btn btn-primary" onClick={createMatch as any}>Aanmaken</button>
-                  </div>
-                )}
-              </div>
-            </section>
           </div>
 
           <div className="stack">
@@ -468,51 +492,61 @@ export default function App(){
                       const hasBoth = typeof nikFrames === 'number' && typeof roelFrames === 'number';
                       const nikLeading = hasBoth && (nikFrames as number) > (roelFrames as number);
                       const roelLeading = hasBoth && (roelFrames as number) > (nikFrames as number);
+                      const winner: 'nik' | 'roel' | null = nikLeading ? 'nik' : roelLeading ? 'roel' : (m.WinnerPlayerID === 'nik' || m.WinnerPlayerID === 'roel') ? m.WinnerPlayerID : null;
                       const displayDate = new Date(m.Date).toLocaleDateString('nl-BE');
                       const tone = nikLeading ? 'match-card-nik' : roelLeading ? 'match-card-roel' : '';
                       const isSelected = selected === m.MatchID;
                       const nikStarted = m.FirstBreakerPlayerID === 'nik';
                       const roelStarted = m.FirstBreakerPlayerID === 'roel';
+                      const starterLabel = (pid: 'nik' | 'roel') => {
+                        const isStarter = pid === 'nik' ? nikStarted : roelStarted;
+                        if (!isStarter) return null;
+                        return <span className="match-starter-name" aria-hidden="true"></span>;
+                      };
                       return (
-                        <div key={m.MatchID} className={['match-card', tone, isSelected ? 'match-card-active' : ''].filter(Boolean).join(' ')}>
-                          <div className="match-card-header">
-                            <div>
-                              <div className="match-card-date">{displayDate}</div>
-                            </div>
-                            <button className="btn btn-primary btn-sm" onClick={()=> setSelected(m.MatchID)}>
-                              {isSelected ? 'Geopend' : 'Bekijk'}
-                            </button>
+                        <button
+                          type="button"
+                          key={m.MatchID}
+                          className={['match-card w-full text-left', tone, isSelected ? 'match-card-active' : ''].filter(Boolean).join(' ')}
+                          onClick={()=> setSelected(m.MatchID)}
+                        >
+                          <div className="match-card-top">
+                            <span className="match-chip">Best of {m.BestOf}</span>
                           </div>
-                          <div className="match-card-scores">
-                            <div className={`match-score-line ${nikLeading ? 'match-score-line-winner-nik' : ''}`}>
-                              <span className="flex items-center gap-2 text-xs font-semibold uppercase text-sky-300">
-                                Nik
-                                {nikStarted && <span className="pill-indicator" aria-hidden="true"></span>}
-                              </span>
-                              <span className={`match-score-value match-score-value-nik`}>
-                                {typeof nikFrames === 'number' ? nikFrames : '—'}
-                              </span>
+                          <div className="match-card-body">
+                            <div className="match-face-row">
+                              <div className="match-player">
+                                <div className={['match-avatar', winner === 'nik' ? '' : 'match-avatar-loser'].join(' ')}>
+                                  {nikStarted && <span className="match-starter-dot" aria-hidden="true"></span>}
+                                  <img src="/Nik.png" alt="Nik" />
+                                </div>
+                                <div className="match-player-name">Nik {starterLabel('nik')}</div>
+                              </div>
+                              <div className="match-score-center">
+                                <div className="match-score-large">
+                                  <span className={nikLeading ? 'text-[var(--primary)]' : ''}>{typeof nikFrames === 'number' ? nikFrames : '—'}</span>
+                                  <span className="match-score-sep"> - </span>
+                                  <span className={roelLeading ? 'text-[var(--primary)]' : ''}>{typeof roelFrames === 'number' ? roelFrames : '—'}</span>
+                                </div>
+                                <div className="match-score-sub">Eindstand • {displayDate}</div>
+                                {loadError && <div className="chip chip-warn mt-1">Score niet beschikbaar</div>}
+                                {!loadError && !hasBoth && <div className="chip chip-neutral mt-1">Nog bezig</div>}
+                              </div>
+                              <div className="match-player">
+                                <div className={['match-avatar', winner === 'roel' ? '' : 'match-avatar-loser'].join(' ')}>
+                                  {roelStarted && <span className="match-starter-dot" aria-hidden="true"></span>}
+                                  <img src="/Roel.png" alt="Roel" />
+                                </div>
+                                <div className="match-player-name">Roel {starterLabel('roel')}</div>
+                              </div>
                             </div>
-                            <div className={`match-score-line ${roelLeading ? 'match-score-line-winner-roel' : ''}`}>
-                              <span className="flex items-center gap-2 text-xs font-semibold uppercase text-amber-200">
-                                Roel
-                                {roelStarted && <span className="pill-indicator" aria-hidden="true"></span>}
-                              </span>
-                              <span className={`match-score-value match-score-value-roel`}>
-                                {typeof roelFrames === 'number' ? roelFrames : '—'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="match-card-flags">
-                            {loadError && <span className="chip chip-warn">Score niet beschikbaar</span>}
-                            {!loadError && !hasBoth && <span className="chip chip-neutral">Nog bezig</span>}
                           </div>
                           {m.Notes && (
                             <div className="match-card-footer">
                               <span className="muted text-xs">{m.Notes}</span>
                             </div>
                           )}
-                        </div>
+                        </button>
                       );
                     })}
                     {matches.length === 0 && <div className="recent-empty">Nog geen matchen.</div>}
