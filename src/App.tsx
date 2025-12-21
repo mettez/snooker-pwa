@@ -29,13 +29,6 @@ type Match = {
   RoelScore?: number;
 };
 
-const KPI_FIELDS: Array<{ key: keyof Stats['nik']; label: string; helper?: string }> = [
-  { key: 'matches', label: 'Wedstrijden' },
-  { key: 'frames', label: 'Frames' },
-  { key: 'hiBreak', label: 'Hoogste Break' },
-  { key: 'breaks10', label: 'Aantal 10+ Breaks' },
-];
-
 function generateDefaultSeasons(current: number) {
   return Array.from({ length: 7 }).map((_, idx) => current + 1 - idx);
 }
@@ -110,7 +103,7 @@ export default function App(){
   const [msg, setMsg] = useState<string | null>(null);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [matchScores, setMatchScores] = useState<Record<string, { nik: number; roel: number } | null>>({});
-  const [showStats, setShowStats] = useState(true);
+  const showStats = true;
   const [showNewMatch, setShowNewMatch] = useState(false);
   const [showRecentMatches, setShowRecentMatches] = useState(true);
 

@@ -199,7 +199,6 @@ export default function MatchDetail({
 
   if (!match) return <div className="card">{msg ?? 'Laden…'}</div>;
 
-  const formattedDate = new Date(match.Date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' });
   const nikStarted = match.FirstBreakerPlayerID === 'nik';
   const roelStarted = match.FirstBreakerPlayerID === 'roel';
   const matchWinner = frameTotals.nik > frameTotals.roel ? 'nik' : frameTotals.roel > frameTotals.nik ? 'roel' : null;
